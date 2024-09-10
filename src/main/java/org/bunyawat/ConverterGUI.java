@@ -1,3 +1,5 @@
+// For UI rendering
+
 package org.bunyawat;
 
 import javax.imageio.ImageIO;
@@ -8,12 +10,14 @@ import java.io.File;
 import java.io.IOException;
 
 class ConverterGUI extends JFrame {
-    private JButton openButton, saveButton, convertButton;
-    private JLabel imageLabel;
-    private BufferedImage originalImage, convertedImage;
-    private final ImageProcessor imageProcessor;
+    private JButton openButton, saveButton, convertButton;  // Tree Buttons in Program
+    private JLabel imageLabel;  // Canvas for Image
+    private BufferedImage originalImage, convertedImage;    // Two
+    private final ImageProcessor imageProcessor;        // Image Processor Instance Jaa
 
     public ConverterGUI() {
+
+        // Initiate UI properties
         setTitle("Operating System Class work 4 POND HELP MEEE");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());

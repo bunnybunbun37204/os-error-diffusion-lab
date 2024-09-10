@@ -1,3 +1,5 @@
+// Image Processor
+
 package org.bunyawat;
 
 import java.awt.image.BufferedImage;
@@ -7,8 +9,10 @@ import java.util.concurrent.TimeUnit;
 
 class ImageProcessor {
 
+    // Threads number
     private final int nThreads;
 
+    // Constructor
     public ImageProcessor(int nThreads) {
         this.nThreads = nThreads;
     }
@@ -20,17 +24,21 @@ class ImageProcessor {
         // Use TYPE_BYTE_BINARY to optimize memory usage
         BufferedImage convertedImage = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_BINARY);
 
+        // Define Thread executor (thread ex = Thread management instance)
         ExecutorService executor = Executors.newFixedThreadPool(nThreads);
 
-        // Create and reuse n threads for rows
+        // Spawn Thread
         for (int i = 0; i < nThreads; i++) {
             int finalI = i;
+
+            // executor.submit is function to spawn thread like threading in python
             executor.submit(() -> processRows(originalImage, convertedImage, width, height, finalI));
         }
 
         // Shutdown the executor
         executor.shutdown();
         try {
+            // Await Executor successfully terminate
             executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -40,6 +48,7 @@ class ImageProcessor {
         return convertedImage;
     }
 
+    // Insane Code from Ajarn
     private void processRows(BufferedImage originalImage, BufferedImage convertedImage, int width, int height, int threadIndex) {
         for (int y = threadIndex; y < height; y += nThreads) {
             for (int x = 0; x < width; x++) {
@@ -58,6 +67,7 @@ class ImageProcessor {
         }
     }
 
+    // From Ajarn
     private void distributeError(BufferedImage image, int x, int y, int error, int width, int height) {
         // Floyd-Steinberg error diffusion, adjusting neighboring pixels
         distributeErrorToPixel(image, x + 1, y, error * 7 / 16, width, height);
@@ -66,6 +76,7 @@ class ImageProcessor {
         distributeErrorToPixel(image, x + 1, y + 1, error / 16, width, height);
     }
 
+    // From Ajarn
     private void distributeErrorToPixel(BufferedImage image, int x, int y, int error, int width, int height) {
         if (x >= 0 && x < width && y >= 0 && y < height) {
             int rgb = image.getRGB(x, y);
