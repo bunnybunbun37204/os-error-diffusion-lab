@@ -9,13 +9,13 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-class ConverterGUI extends JFrame {
-    private JButton openButton, saveButton, convertButton;  // Tree Buttons in Program
+class ProgramGUI extends JFrame {
+    private JButton openButton, saveButton, convertButton;  // 3 Buttons in Program
     private JLabel imageLabel;  // Canvas for Image
-    private BufferedImage originalImage, convertedImage;    // Two
+    private BufferedImage originalImage, convertedImage;    // Two image instance
     private final ImageProcessor imageProcessor;        // Image Processor Instance Jaa
 
-    public ConverterGUI() {
+    protected ProgramGUI() {
 
         // Initiate UI properties
         setTitle("Operating System Class work 4 POND HELP MEEE");

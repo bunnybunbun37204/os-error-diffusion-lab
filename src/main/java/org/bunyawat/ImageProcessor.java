@@ -13,11 +13,11 @@ class ImageProcessor {
     private final int nThreads;
 
     // Constructor
-    public ImageProcessor(int nThreads) {
+    protected ImageProcessor(int nThreads) {
         this.nThreads = nThreads;
     }
 
-    public BufferedImage convertToBlackAndWhite(BufferedImage originalImage) {
+    protected BufferedImage convertToBlackAndWhite(BufferedImage originalImage) {
         int width = originalImage.getWidth();
         int height = originalImage.getHeight();
 
