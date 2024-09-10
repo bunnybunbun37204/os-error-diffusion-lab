@@ -18,7 +18,7 @@ class ConverterGUI extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        imageProcessor = new ImageProcessor();
+        imageProcessor = new ImageProcessor(Runtime.getRuntime().availableProcessors());
 
         initComponents();
         addComponentsToFrame();
@@ -33,6 +33,7 @@ class ConverterGUI extends JFrame {
         saveButton = new JButton("Save Image");
         convertButton = new JButton("Convert");
         imageLabel = new JLabel();
+        imageLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         imageLabel.setHorizontalAlignment(JLabel.CENTER);
     }
 
