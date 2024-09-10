@@ -14,7 +14,7 @@ class ConverterGUI extends JFrame {
     private final ImageProcessor imageProcessor;
 
     public ConverterGUI() {
-        setTitle("Grayscale to Black-White Converter");
+        setTitle("Operating System Class work 4 POND HELP MEEE");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
