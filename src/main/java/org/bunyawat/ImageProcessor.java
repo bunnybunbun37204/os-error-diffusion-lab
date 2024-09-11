@@ -1,5 +1,3 @@
-// Image Processor
-
 package org.bunyawat;
 
 import java.awt.image.BufferedImage;
@@ -8,81 +6,70 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 class ImageProcessor {
-
-    // Threads number
     private final int nThreads;
+    private final long[] cpuTimes;  // To store CPU time for each thread
 
-    // Constructor
     protected ImageProcessor(int nThreads) {
         this.nThreads = nThreads;
+        cpuTimes = new long[nThreads];
     }
 
     protected BufferedImage convertToBlackAndWhite(BufferedImage originalImage) {
         int width = originalImage.getWidth();
         int height = originalImage.getHeight();
-
-        // Use TYPE_BYTE_BINARY to optimize memory usage
         BufferedImage convertedImage = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_BINARY);
-
-        // Define Thread executor (thread ex = Thread management instance)
         ExecutorService executor = Executors.newFixedThreadPool(nThreads);
 
-        // Spawn Thread
         for (int i = 0; i < nThreads; i++) {
             int finalI = i;
-
-            // executor.submit is function to spawn thread like threading in python
-            executor.submit(() -> processRows(originalImage, convertedImage, width, height, finalI));
+            executor.submit(() -> {
+                long startTime = System.nanoTime();  // Start time for CPU usage
+                processRows(originalImage, convertedImage, width, height, finalI);
+                long endTime = System.nanoTime();    // End time for CPU usage
+                cpuTimes[finalI] = endTime - startTime;  // Calculate CPU time used by this thread
+            });
         }
 
-        // Shutdown the executor
         executor.shutdown();
         try {
-            // Await Executor successfully terminate
             executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            System.err.println("Thread interrupted: " + e.getMessage());
         }
 
         return convertedImage;
     }
 
-    // Insane Code from Ajarn
     private void processRows(BufferedImage originalImage, BufferedImage convertedImage, int width, int height, int threadIndex) {
         for (int y = threadIndex; y < height; y += nThreads) {
             for (int x = 0; x < width; x++) {
                 int rgb = originalImage.getRGB(x, y);
-                int gray = (rgb >> 16) & 0xFF; // Extract grayscale value from the red channel
-
-                // Use integer thresholding for black-and-white conversion
+                int gray = (rgb >> 16) & 0xFF;
                 int newPixel = (gray < 128) ? 0 : 255;
                 int error = gray - newPixel;
-
                 convertedImage.setRGB(x, y, (newPixel << 16) | (newPixel << 8) | newPixel);
-
-                // Distribute error using the Floyd-Steinberg dithering algorithm
                 distributeError(originalImage, x, y, error, width, height);
             }
         }
     }
 
-    // From Ajarn
     private void distributeError(BufferedImage image, int x, int y, int error, int width, int height) {
-        // Floyd-Steinberg error diffusion, adjusting neighboring pixels
         distributeErrorToPixel(image, x + 1, y, error * 7 / 16, width, height);
         distributeErrorToPixel(image, x - 1, y + 1, error * 3 / 16, width, height);
         distributeErrorToPixel(image, x, y + 1, error * 5 / 16, width, height);
         distributeErrorToPixel(image, x + 1, y + 1, error / 16, width, height);
     }
 
-    // From Ajarn
     private void distributeErrorToPixel(BufferedImage image, int x, int y, int error, int width, int height) {
         if (x >= 0 && x < width && y >= 0 && y < height) {
             int rgb = image.getRGB(x, y);
-            int gray = (rgb >> 16) & 0xFF; // Extract grayscale value from the red channel
+            int gray = (rgb >> 16) & 0xFF;
             int newGray = Math.max(0, Math.min(255, gray + error));
             image.setRGB(x, y, (newGray << 16) | (newGray << 8) | newGray);
         }
+    }
+
+    public long[] getCpuTimes() {
+        return cpuTimes;  // Return CPU times to be used in the chart
     }
 }
