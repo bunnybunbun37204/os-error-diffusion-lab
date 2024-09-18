@@ -7,11 +7,11 @@ import java.util.concurrent.TimeUnit;
 
 class ImageProcessor {
     private final int nThreads;
-    private final long[] cpuTimes;  // To store CPU time for each thread
+    private long cpuTimes;  // To store CPU time for each thread
 
     protected ImageProcessor(int nThreads) {
         this.nThreads = nThreads;
-        cpuTimes = new long[nThreads];
+        cpuTimes = 0;
     }
 
     protected BufferedImage convertToBlackAndWhite(BufferedImage originalImage) {
@@ -19,16 +19,16 @@ class ImageProcessor {
         int height = originalImage.getHeight();
         BufferedImage convertedImage = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_BINARY);
         ExecutorService executor = Executors.newFixedThreadPool(nThreads);
-
+        System.out.println("T: " + nThreads);
+        long startTime = System.nanoTime();  // Start time for CPU usage
         for (int i = 0; i < nThreads; i++) {
             int finalI = i;
             executor.submit(() -> {
-                long startTime = System.nanoTime();  // Start time for CPU usage
                 processRows(originalImage, convertedImage, width, height, finalI);
-                long endTime = System.nanoTime();    // End time for CPU usage
-                cpuTimes[finalI] = endTime - startTime;  // Calculate CPU time used by this thread
             });
         }
+        long endTime = System.nanoTime();    // End time for CPU usage
+        cpuTimes= endTime - startTime;  // Calculate CPU time used by this thread
 
         executor.shutdown();
         try {
@@ -69,7 +69,7 @@ class ImageProcessor {
         }
     }
 
-    public long[] getCpuTimes() {
+    public long getCpuTimes() {
         return cpuTimes;  // Return CPU times to be used in the chart
     }
 }

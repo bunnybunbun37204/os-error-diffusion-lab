@@ -10,10 +10,11 @@ import java.io.IOException;
 class ProgramGUI extends JFrame {
     private JButton openButton, saveButton, convertButton;  // 3 Buttons in Program
     private JLabel imageLabel;  // Canvas for Image
-    private BufferedImage originalImage, convertedImage;    // Two image instance
-    private final ImageProcessor imageProcessor;        // Image Processor Instance Jaa
+    private BufferedImage originalImage, convertedImage, resultedImage;    // Two image instance
+    private final ImageProcessor[] imageProcessor;        // Image Processor Instance Jaa
     private final long[] cpuTimes;   // List to hold CPU usage times
     private JButton showCPUUsageButton;
+    private final int availableProcessors;
 
     protected ProgramGUI() {
 
@@ -22,9 +23,15 @@ class ProgramGUI extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        int availableProcessors = Runtime.getRuntime().availableProcessors();
-        imageProcessor = new ImageProcessor(availableProcessors);
-        cpuTimes = imageProcessor.getCpuTimes(); // Initialize list with available CPUs
+        availableProcessors = Runtime.getRuntime().availableProcessors();
+        imageProcessor = new ImageProcessor[8];
+        cpuTimes = new long[availableProcessors];
+
+        for (int i = 0; i < availableProcessors; i++) {
+            imageProcessor[i] = new ImageProcessor(i+1);
+        }
+
+
 
         initComponents();
         addComponentsToFrame();
@@ -83,7 +90,10 @@ class ProgramGUI extends JFrame {
             return;
         }
 
-        convertedImage = imageProcessor.convertToBlackAndWhite(originalImage);
+        for (int i = 0; i < this.availableProcessors; i++) {
+            convertedImage = imageProcessor[i].convertToBlackAndWhite(originalImage);
+            cpuTimes[i] = imageProcessor[i].getCpuTimes();
+        }
         imageLabel.setIcon(new ImageIcon(convertedImage));
     }
 

@@ -14,7 +14,9 @@ public class CoreGraph {
 
         // Add CPU usage data to dataset
         for (int i = 0; i < cpuTimes.length; i++) {
-            dataset.addValue(cpuTimes[i], "CPU Time", "CPU" + i);
+            int count = i+1;
+            System.out.println(cpuTimes[i]);
+            dataset.addValue(cpuTimes[i], "CPU Time" + cpuTimes.length, "" + count);
         }
 
         // Create bar chart
