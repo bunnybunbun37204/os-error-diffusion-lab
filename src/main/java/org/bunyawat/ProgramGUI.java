@@ -10,7 +10,7 @@ import java.io.IOException;
 class ProgramGUI extends JFrame {
     private JButton openButton, saveButton, convertButton;  // 3 Buttons in Program
     private JLabel imageLabel;  // Canvas for Image
-    private BufferedImage originalImage, convertedImage, resultedImage;    // Two image instance
+    private BufferedImage originalImage, convertedImage, tempImage;    // Two image instance
     private final ImageProcessor[] imageProcessor;        // Image Processor Instance Jaa
     private final long[] cpuTimes;   // List to hold CPU usage times
     private JButton showCPUUsageButton;
@@ -23,15 +23,13 @@ class ProgramGUI extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        availableProcessors = Runtime.getRuntime().availableProcessors();
-        imageProcessor = new ImageProcessor[8];
+        availableProcessors = Runtime.getRuntime().availableProcessors() - 2;
+        imageProcessor = new ImageProcessor[availableProcessors];
         cpuTimes = new long[availableProcessors];
 
         for (int i = 0; i < availableProcessors; i++) {
             imageProcessor[i] = new ImageProcessor(i+1);
         }
-
-
 
         initComponents();
         addComponentsToFrame();
@@ -67,7 +65,12 @@ class ProgramGUI extends JFrame {
         openButton.addActionListener(e -> openImage());
         convertButton.addActionListener(e -> convertImage());
         saveButton.addActionListener(e -> saveImage());
-        showCPUUsageButton.addActionListener(e -> CoreGraph.showCPUUsageChart(cpuTimes));  // Show CPU usage chart on click
+        showCPUUsageButton.addActionListener(e -> {
+            CoreGraph.showCPUUsageChart(cpuTimes);
+            for (int i = 0; i < availableProcessors; i++) {
+                cpuTimes[i] = 0;
+            }
+        });  // Show CPU usage chart on click
     }
 
     private void openImage() {
@@ -93,8 +96,9 @@ class ProgramGUI extends JFrame {
         for (int i = 0; i < this.availableProcessors; i++) {
             convertedImage = imageProcessor[i].convertToBlackAndWhite(originalImage);
             cpuTimes[i] = imageProcessor[i].getCpuTimes();
+            if (i == 0) tempImage = convertedImage;
         }
-        imageLabel.setIcon(new ImageIcon(convertedImage));
+        imageLabel.setIcon(new ImageIcon(tempImage));
     }
 
     private void saveImage() {
